@@ -177,7 +177,7 @@ async function paymentOfHousehold(household,paymentType) {
 }
 
 
-var transactionpayment = (req, res, next) => {
+var transactionpayment = async (req, res, next) => {
 
     /*
     Payment.findOneAndUpdate({paymentType:req.body.paymentType},{$set:{amountDue:req.body.amount}},{new:true},function(err,doc) {
@@ -255,20 +255,24 @@ var transactionpayment = (req, res, next) => {
                     paymentId: paymentId
                 });
 
-                Promise.all([firstQuery, secondQuery, thirdQuery]).then((reso) => {
+                Promise.all([firstQuery, secondQuery, thirdQuery]).then(async (reso) => {
 
                     var lender = '';
                     var paymentLender = 0;
                     var mem = reso[2];
                     var paymentLender = await lenderMember(mem[0].lender);
                     //}).then((r) => {
+                    console.log('checking lender payment 1');
+                    console.log(paymentLender);
+                    console.log('checking payment lender 2');   
                     var updAmountForMember = await updMemAmount(mem[0].lender,paymentAmount,paymentLender);
                     var  updAmountDue = paymentItem.amountDue - paymentAmount;
                     console.log('some checks here 1');
                     console.log(updAmountDue);
                     console.log('some check here 2');
                     var updPaymentOfHousehold = await updPaymentAndHousehold(paymentType,req.body.household,updAmountDue);
-                    return updPaymentOfHousehold;
+                    console.log(updPaymentOfHousehold);
+                     res.json(updPaymentOfHousehold);
                             
                 })
 
@@ -339,9 +343,7 @@ async function updPaymentAndHousehold(paymentType,household,updAmountDue) {
                                 })
                             } else {
                                 console.log(updPayment);
-                                resolve({
-                                    message: 'Payment successfully made '
-                                })
+                                resolve({message: 'Payment Was successfull'});
                             }
 
     })
